@@ -1,0 +1,124 @@
+{
+  "base_url": "http://127.0.0.1:8011",
+  "started_at": "2026-11-20T19:57:35",
+  "max_tokens": 16,
+  "models": [
+    "extra-code-30m"
+  ],
+  "model": "extra-code-30m",
+  "batch": {
+    "requests": 2,
+    "errors": [],
+    "estimated_tokens": false,
+    "latency_s": {
+      "n": 2,
+      "mean": 0.0109,
+      "p50": 0.0109,
+      "p95": 0.0144,
+      "min": 0.0071,
+      "max": 0.0148
+    },
+    "tokens_per_s": {
+      "n": 0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "stream": {
+    "requests": 2,
+    "errors": [],
+    "estimated_tokens": false,
+    "ttft_s": {
+      "n": 2,
+      "mean": 0.0072,
+      "p50": 0.0072,
+      "p95": 0.0078,
+      "min": 0.0066,
+      "max": 0.0078
+    },
+    "inter_token_s": {
+      "n": 30,
+      "mean": 0.0004,
+      "p50": 0.0004,
+      "p95": 0.0006,
+      "min": 0.0003,
+      "max": 0.001
+    },
+    "tokens_per_s": {
+      "n": 2,
+      "mean": 2336.014,
+      "p50": 2336.014,
+      "p95": 2373.9106,
+      "min": 2293.9068,
+      "max": 2378.1213
+    },
+    "completion_tokens": {
+      "n": 2,
+      "mean": 16.0,
+      "p50": 16.0,
+      "p95": 16.0,
+      "min": 16.0,
+      "max": 16.0
+    },
+    "latency_s": {
+      "n": 2,
+      "mean": 0.0141,
+      "p50": 0.0141,
+      "p95": 0.0147,
+      "min": 0.0134,
+      "max": 0.0148
+    }
+  },
+  "prefix": {
+    "repeats": 3,
+    "errors": [],
+    "prefix_chars": 2748,
+    "prompt_tokens": 996,
+    "cold_ttft_s": 0.0142,
+    "warm_ttft_s": {
+      "n": 2,
+      "mean": 0.0053,
+      "p50": 0.0053,
+      "p95": 0.0054,
+      "min": 0.0052,
+      "max": 0.0054
+    },
+    "speedup": 2.68,
+    "estimated_tokens": false
+  },
+  "concurrency": {
+    "concurrency": 2,
+    "errors": [],
+    "wall_s": 0.031,
+    "aggregate_tokens_per_s": 1045.66,
+    "per_request_tokens_per_s": {
+      "n": 2,
+      "mean": 2207.8658,
+      "p50": 2207.8658,
+      "p95": 2679.2992,
+      "min": 1684.051,
+      "max": 2731.6807
+    },
+    "ttft_s": {
+      "n": 2,
+      "mean": 0.0155,
+      "p50": 0.0155,
+      "p95": 0.0184,
+      "min": 0.0122,
+      "max": 0.0187
+    },
+    "latency_s": {
+      "n": 2,
+      "mean": 0.0231,
+      "p50": 0.0231,
+      "p95": 0.0277,
+      "min": 0.018,
+      "max": 0.0282
+    },
+    "estimated_tokens": false
+  },
+  "finished_at": "2026-11-20T19:57:36"
+}

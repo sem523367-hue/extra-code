@@ -1,0 +1,85 @@
+# --- python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.so
+*.pyd
+
+# --- secrets / local config ----------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- data pipeline --------------------------------------------------------
+# the corpus and the built index are regenerable: fetchers (data/fetch_*.py)
+# rebuild the corpus, `python -m server.kb --build` rebuilds the index
+data/raw/
+data/clean/
+data/corpus/
+data/kb/
+# old training artifacts stay out; the five hf_*.jsonl feeds are small
+# (~10 MB total) and the knowledge base indexes them, so they ship
+data/sft/*.jsonl
+!data/sft/hf_*.jsonl
+data/*.bin
+data/meta.json
+data/run_report.json
+tokenizer/
+.smoke/
+
+# --- training (the old 25M pipeline; kept locally, not shipped) -----------
+runs/
+wandb/
+*.pt
+*.pth
+*.ckpt
+export/
+
+# --- serving engine -------------------------------------------------------
+# weights are downloaded by data/download_model.py; llama.cpp builds come
+# from official releases (see README, step 4)
+models/
+tools/llama.cpp/
+tools/llama.cpp-src/
+tools/llama.cpp-vulkan/
+tools/*.zip
+*.gguf
+*.onnx
+*.engine
+
+# --- run artifacts in the repo root --------------------------------------
+*.json.bak
+bench.json
+e2e_result.json
+final_check.json
+stack_check.json
+err.txt
+
+# --- runtime state --------------------------------------------------------
+server/data/
+bot/data/
+*.db
+*.db-wal
+*.db-shm
+*.log
+nginx/*.log
+
+# --- editor ---------------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

@@ -1,0 +1,35 @@
+[Unit]
+Description=llama.cpp server with prefix caching and FlashAttention
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=extracode
+Group=extracode
+EnvironmentFile=/etc/extra-code/llama.env
+# --parallel keeps N slots for continuous batching, --cache-ram keeps prompt
+# KV data in RAM, -fa selects FlashAttention, --prompt-cache persists the KV
+# cache of reusable prefixes across restarts (read-only mode).
+ExecStart=/opt/llama.cpp/build/bin/llama-server \
+  -m /srv/models/extra-code-q4_k_m.gguf \
+  --host 127.0.0.1 --port 8080 \
+  --ctx-size 4096 \
+  --parallel 4 \
+  --cont-batching \
+  -fa \
+  --prompt-cache /var/cache/extra-code/prompt.cache \
+  --prompt-cache-ro \
+  --cache-ram 4096 \
+  --threads 8 \
+  --n-predict 512 \
+  --api-key ${LLAMA_API_KEY}
+Restart=always
+RestartSec=2
+TimeoutStopSec=30
+LimitNOFILE=65536
+StateDirectory=extra-code
+CacheDirectory=extra-code
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird — Extra Code</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #0c1014;
+    display: flex; align-items: center; justify-content: center; }
+  canvas { border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,.6);
+    cursor: pointer; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="480" height="640"></canvas>
+<script>
+"use strict";
+// Working rewrite of the agent's Flappy clone. The agent's original
+// (agent-original.html) crashed: undeclared state vars, double
+// getContext, six missing PNGs, display:none body. This version draws
+// everything with canvas shapes — no assets, no build.
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const W = canvas.width, H = canvas.height;
+const GROUND_Y = 580;
+
+const CONFIG = {
+  gravity: 1800,        // px/s^2
+  flapImpulse: -520,    // px/s
+  pipeGap: 150,         // px
+  pipeSpeed: 180,       // px/s
+  pipeSpacing: 230,     // px between pipe pairs
+  birdRadius: 14,
+  maxDt: 0.033,         // clamp so a hidden tab doesn't teleport the bird
+};
+
+const STATE = { READY: 0, PLAY: 1, DEAD: 2 };
+
+const game = {
+  state: STATE.READY,
+  birdY: H / 2,
+  birdV: 0,
+  birdX: 120,
+  pipes: [],            // {x, gapY, scored}
+  groundX: 0,
+  score: 0,
+  highScore: Number(localStorage.getItem("highScore") || 0),
+  deadAt: 0,
+  flashT: 0,
+};
+
+function reset() {
+  game.birdY = H / 2;
+  game.birdV = 0;
+  game.pipes = [];
+  game.score = 0;
+  spawnPipe(W + 120);
+  spawnPipe(W + 120 + CONFIG.pipeSpacing);
+  spawnPipe(W + 120 + CONFIG.pipeSpacing * 2);
+}
+
+function spawnPipe(x) {
+  const margin = 70;
+  const gapY = margin + Math.random() * (GROUND_Y - CONFIG.pipeGap - margin * 2);
+  game.pipes.push({ x, gapY, scored: false });
+}
+
+function flap() {
+  if (game.state === STATE.READY) {
+    game.state = STATE.PLAY;
+    reset();
+    game.birdV = CONFIG.flapImpulse;
+  } else if (game.state === STATE.PLAY) {
+    game.birdV = CONFIG.flapImpulse;
+  } else if (game.state === STATE.DEAD && performance.now() - game.deadAt > 500) {
+    game.state = STATE.READY;
+    reset();
+  }
+}
+
+function circleRectHit(cx, cy, r, rx, ry, rw, rh) {
+  const nx = Math.max(rx, Math.min(cx, rx + rw));
+  const ny = Math.max(ry, Math.min(cy, ry + rh));
+  const dx = cx - nx, dy = cy - ny;
+  return dx * dx + dy * dy < r * r;
+}
+
+function update(dt) {
+  game.flashT = Math.max(0, game.flashT - dt);
+
+  if (game.state === STATE.READY) {
+    game.birdY = H / 2 + Math.sin(performance.now() / 300) * 10;
+    game.groundX = (game.groundX - 100 * dt) % 24;
+    return;
+  }
+
+  if (game.state === STATE.DEAD) return;
+
+  // bird physics
+  game.birdV += CONFIG.gravity * dt;
+  game.birdY += game.birdV * dt;
+
+  // pipes
+  for (const p of game.pipes) p.x -= CONFIG.pipeSpeed * dt;
+  if (game.pipes.length && game.pipes[0].x < -70) game.pipes.shift();
+  const last = game.pipes[game.pipes.length - 1];
+  if (last && last.x < W - CONFIG.pipeSpacing) spawnPipe(last.x + CONFIG.pipeSpacing);
+
+  // scoring: center of the bird passes the pipe center
+  for (const p of game.pipes) {
+    if (!p.scored && p.x + 35 < game.birdX) {
+      p.scored = true;
+      game.score++;
+      if (game.score > game.highScore) {
+        game.highScore = game.score;
+        localStorage.setItem("highScore", String(game.highScore));
+      }
+    }
+  }
+
+  // ground
+  game.groundX = (game.groundX - 100 * dt) % 24;
+
+  // collisions
+  const r = CONFIG.birdRadius;
+  if (game.birdY + r >= GROUND_Y) { die(); return; }
+  if (game.birdY - r < -40) { game.birdY = -40 + r; game.birdV = 0; }
+  for (const p of game.pipes) {
+    const pw = 70;
+    if (circleRectHit(game.birdX, game.birdY, r, p.x, 0, pw, p.gapY) ||
+        circleRectHit(game.birdX, game.birdY, r, p.x,
+                      p.gapY + CONFIG.pipeGap, pw, GROUND_Y - p.gapY - CONFIG.pipeGap)) {
+      die(); return;
+    }
+  }
+}
+
+function die() {
+  game.state = STATE.DEAD;
+  game.deadAt = performance.now();
+  game.flashT = 0.18;
+}
+
+// ---- rendering -------------------------------------------------------------
+
+function drawBird() {
+  const x = game.birdX, y = game.birdY;
+  const tilt = Math.max(-0.5, Math.min(1.2, game.birdV / 600));
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(tilt);
+  // body
+  ctx.fillStyle = "#f7c744";
+  ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
+  // belly
+  ctx.fillStyle = "#f8e6a8";
+  ctx.beginPath(); ctx.arc(0, 5, 8, 0, Math.PI * 2); ctx.fill();
+  // wing (flaps with velocity)
+  const wingY = game.state === STATE.PLAY
+    ? Math.sin(performance.now() / 60) * 3 : 0;
+  ctx.fillStyle = "#e8a72a";
+  ctx.beginPath(); ctx.ellipse(-6, 3 + wingY, 7, 5, 0, 0, Math.PI * 2); ctx.fill();
+  // eye
+  ctx.fillStyle = "#fff";
+  ctx.beginPath(); ctx.arc(6, -5, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.beginPath(); ctx.arc(7.5, -5, 2.2, 0, Math.PI * 2); ctx.fill();
+  // beak
+  ctx.fillStyle = "#e8622a";
+  ctx.beginPath();
+  ctx.moveTo(12, 0); ctx.lineTo(21, 3); ctx.lineTo(12, 6); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function drawPipes() {
+  const pw = 70;
+  for (const p of game.pipes) {
+    const gapBottom = p.gapY + CONFIG.pipeGap;
+    for (const [y, h] of [[0, p.gapY], [gapBottom, GROUND_Y - gapBottom]]) {
+      if (h <= 0) continue;
+      const g = ctx.createLinearGradient(p.x, 0, p.x + pw, 0);
+      g.addColorStop(0, "#5aa832"); g.addColorStop(.5, "#7ec850"); g.addColorStop(1, "#4c9028");
+      ctx.fillStyle = g;
+      ctx.fillRect(p.x, y, pw, h);
+      // cap
+      ctx.fillStyle = "#6ab63e";
+      ctx.fillRect(p.x - 5, (y === 0 ? p.gapY - 26 : gapBottom), pw + 10, 26);
+      ctx.strokeStyle = "#3a6e1f"; ctx.lineWidth = 2;
+      ctx.strokeRect(p.x - 5, (y === 0 ? p.gapY - 26 : gapBottom), pw + 10, 26);
+    }
+  }
+}
+
+function drawBackground() {
+  const g = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+  g.addColorStop(0, "#3fb0e8"); g.addColorStop(1, "#bfe8f7");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, GROUND_Y);
+  // lazy clouds
+  ctx.fillStyle = "rgba(255,255,255,.75)";
+  for (let i = 0; i < 3; i++) {
+    const cx = ((i * 190 + performance.now() / 90) % (W + 120)) - 60;
+    const cy = 70 + i * 55;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+    ctx.arc(cx + 24, cy + 6, 17, 0, Math.PI * 2);
+    ctx.arc(cx - 24, cy + 8, 15, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // distant city strip
+  ctx.fillStyle = "rgba(60,120,150,.35)";
+  for (let i = 0; i < 14; i++) {
+    const bw = 40, bx = i * bw - 8;
+    const bh = 30 + ((i * 37) % 50);
+    ctx.fillRect(bx, GROUND_Y - bh, bw - 10, bh);
+  }
+}
+
+function drawGround() {
+  ctx.fillStyle = "#ded895";
+  ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+  ctx.fillStyle = "#7ec850";
+  ctx.fillRect(0, GROUND_Y, W, 14);
+  ctx.fillStyle = "#5aa832";
+  for (let x = game.groundX; x < W; x += 24) {
+    ctx.fillRect(x, GROUND_Y + 14, 12, 6);
+  }
+}
+
+function drawTexts() {
+  ctx.textAlign = "center";
+  if (game.state === STATE.PLAY || game.state === STATE.DEAD) {
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.lineWidth = 5;
+    ctx.font = "700 52px 'Segoe UI', sans-serif";
+    ctx.strokeText(String(game.score), W / 2, 90);
+    ctx.fillText(String(game.score), W / 2, 90);
+  }
+  if (game.state === STATE.READY) {
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.lineWidth = 6;
+    ctx.font = "700 44px 'Segoe UI', sans-serif";
+    ctx.strokeText("FLAPPY", W / 2, 180);
+    ctx.fillText("FLAPPY", W / 2, 180);
+    ctx.font = "600 20px 'Segoe UI', sans-serif";
+    ctx.strokeText("пробел / клик / тап — взмах", W / 2, 470);
+    ctx.fillText("пробел / клик / тап — взмах", W / 2, 470);
+    ctx.font = "14px 'Segoe UI', sans-serif";
+    ctx.fillText("рекорд: " + game.highScore, W / 2, 500);
+  }
+  if (game.state === STATE.DEAD) {
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 6;
+    ctx.font = "700 40px 'Segoe UI', sans-serif";
+    ctx.strokeText("ИГРА ОКОНЧЕНА", W / 2, 220);
+    ctx.fillText("ИГРА ОКОНЧЕНА", W / 2, 220);
+    ctx.font = "600 20px 'Segoe UI', sans-serif";
+    const canRestart = performance.now() - game.deadAt > 500;
+    ctx.strokeText("счёт: " + game.score + "   рекорд: " + game.highScore, W / 2, 260);
+    ctx.fillText("счёт: " + game.score + "   рекорд: " + game.highScore, W / 2, 260);
+    if (canRestart) {
+      ctx.font = "600 18px 'Segoe UI', sans-serif";
+      ctx.strokeText("взмах — заново", W / 2, 300);
+      ctx.fillText("взмах — заново", W / 2, 300);
+    }
+  }
+  if (game.flashT > 0) {
+    ctx.fillStyle = "rgba(255,255,255," + (game.flashT / 0.18 * 0.7) + ")";
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+function render() {
+  drawBackground();
+  drawPipes();
+  drawGround();
+  drawBird();
+  drawTexts();
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(CONFIG.maxDt, (now - lastT) / 1000);
+  lastT = now;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener("keydown", e => {
+  if (e.code === "Space" || e.key === " ") { e.preventDefault(); flap(); }
+});
+canvas.addEventListener("mousedown", flap);
+canvas.addEventListener("touchstart", e => { e.preventDefault(); flap(); },
+  { passive: false });
+
+reset();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Clone</title>
+</head>
+<body style="display:none;">
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+    <script>
+        const CONFIG = {
+            gravity: 1800,
+            flapImpulse: -520,
+            pipeSpawnTime: 1400,
+            pipeGap: 150,
+            pipeSpeed: 180,
+            groundSpeed: 100,
+            score: 0,
+            highScore: localStorage.getItem('highScore') || 0
+        };
+
+        function getRandomHeight() {
+            return Math.floor(Math.random() * 200);
+        }
+
+        function getRandomY() {
+            return CONFIG.pipeGap / 2 + CONFIG.pipeGap / 4 * Math.floor(Math.random() * 3);
+        }
+
+        function drawBird(ctx, x, y) {
+            ctx.drawImage(bird, x, y);
+            ctx.beginPath();
+            ctx.arc(x, y - 10, 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawPipe(ctx, x, y, y2) {
+            ctx.drawImage(pipe, x, y);
+            ctx.drawImage(pipe, x, y2);
+        }
+
+        function drawGround(ctx) {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 580, 480, 20);
+        }
+
+        function updateBirdPosition() {
+            if (birdY <= 580) {
+                birdY += CONFIG.gravity * delta;
+                if (birdY > 580) birdY = 580;
+                if (birdY < 0) birdY = 0;
+                drawBird(gameCanvas.getContext('2d'), birdX, birdY);
+            }
+        }
+
+        function updatePipePosition() {
+            pipeX -= CONFIG.pipeSpeed * delta;
+            if (pipeX < -50) pipeX = CONFIG.pipeSpawnTime;
+            drawPipe(gameCanvas.getContext('2d'), pipeX, pipeY, pipeY2);
+        }
+
+        function updateGroundPosition() {
+            groundX -= CONFIG.groundSpeed * delta;
+            if (groundX < -280) groundX = CONFIG.pipeSpawnTime;
+            drawGround(gameCanvas.getContext('2d'));
+        }
+
+        function update() {
+            updateBirdPosition();
+            updatePipePosition();
+            updateGroundPosition();
+            gameCanvas.getContext('2d').drawImage(background, 0, 0);
+        }
+
+        function checkCollision() {
+            if (gameCanvas.getContext('2d').getImageData(birdX, birdY + 10, 1, 1).data[0] === 0) {
+                return true;
+            }
+            if (pipeX <= birdX && pipeX + 50 >= birdX) {
+                if (pipeY <= birdY && pipeY + 50 >= birdY) {
+                    return true;
+                }
+                if (pipeY2 <= birdY && pipeY2 + 50 >= birdY) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function flap() {
+            if (gameCanvas.getContext('2d').getImageData(birdX, birdY - 5, 1, 1).data[0] !== 0) {
+                CONFIG.score += 1;
+                gameCanvas.getContext('2d').fillText(CONFIG.score.toString(), birdX - 10, 10);
+                CONFIG.highScore = Math.max(CONFIG.score, CONFIG.highScore);
+                localStorage.setItem('highScore', CONFIG.highScore);
+            }
+            birdY -= CONFIG.flapImpulse * delta;
+            if (birdY < 0) birdY = 0;
+            drawBird(gameCanvas.getContext('2d'), birdX, birdY);
+        }
+
+        function start() {
+            gameCanvas.getContext('2d').drawImage(background, 0, 0);
+            CONFIG.score = 0;
+            CONFIG.highScore = localStorage.getItem('highScore') || 0;
+            birdY = 180;
+            pipeX = CONFIG.pipeSpawnTime;
+            pipeY = getRandomY();
+            pipeY2 = pipeY + CONFIG.pipeGap;
+            birdX = 200;
+            birdX += CONFIG.flapImpulse * delta;
+            gameCanvas.getContext('2d').fillText(CONFIG.highScore.toString(), 20, 10);
+        }
+
+        function render() {
+            gameCanvas.getContext('2d').drawImage(background, 0, 0);
+            drawBird(gameCanvas.getContext('2d'), birdX, birdY);
+            drawPipe(gameCanvas.getContext('2d'), pipeX, pipeY, pipeY2);
+            drawGround(gameCanvas.getContext('2d'));
+            gameCanvas.getContext('2d').drawImage(tap, birdX - 80, birdY - 20);
+            gameCanvas.getContext('2d').drawImage(click, birdX - 80, birdY - 20);
+            gameCanvas.getContext('2d').drawImage(space, birdX - 80, birdY - 20);
+            if (checkCollision()) {
+                start();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            }
+        }
+
+        function init() {
+            const canvas = document.getElementById('gameCanvas');
+            gameCanvas = canvas.getContext('2d');
+            gameCanvas.scale(window.devicePixelRatio, window.devicePixelRatio);
+            CONFIG.pipeSpawnTime = CONFIG.pipeSpawnTime / window.devicePixelRatio;
+            CONFIG.groundSpeed = CONFIG.groundSpeed / window.devicePixelRatio;
+            CONFIG.flapImpulse = CONFIG.flapImpulse / window.devicePixelRatio;
+            CONFIG.highScore = CONFIG.highScore / window.devicePixelRatio;
+            CONFIG.score = CONFIG.score / window.devicePixelRatio;
+            CONFIG.pipeGap = CONFIG.pipeGap / window.devicePixelRatio;
+            CONFIG.pipeSpeed = CONFIG.pipeSpeed / window.devicePixelRatio;
+            CONFIG.pipeX = CONFIG.pipeX / window.devicePixelRatio;
+            CONFIG.pipeY = CONFIG.pipeY / window.devicePixelRatio;
+            CONFIG.pipeY2 = CONFIG.pipeY2 / window.devicePixelRatio;
+            CONFIG.groundX = CONFIG.groundX / window.devicePixelRatio;
+            gameCanvas.scale(window.devicePixelRatio, window.devicePixelRatio);
+            const tap = new Image();
+            tap.src = 'tap.png';
+            const click = new Image();
+            click.src = 'click.png';
+            const space = new Image();
+            space.src = 'space.png';
+            background = new Image();
+            background.src = 'background.png';
+            pipe = new Image();
+            pipe.src = 'pipe.png';
+            bird = new Image();
+            bird.src = 'bird.png';
+            gameCanvas.scale(window.devicePixelRatio, window.devicePixelRatio);
+            window.addEventListener('mousedown', (e) => {
+                if (e.clientX >= birdX - 80 && e.clientX <= birdX + 80) {
+                    flap();
+                }
+            });
+            window.addEventListener('touchstart', (e) => {
+                if (e.touches[0].clientX >= birdX - 80 && e.clientX <= birdX + 80) {
+                    flap();
+                }
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === ' ') {
+                    flap();
+                }
+            });
+            setInterval(() => {
+                update();
+                render();
+            }, 16);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

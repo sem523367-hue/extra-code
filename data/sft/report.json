@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-11-21T16:27:50.807241+00:00",
+  "source": "data\\clean\\train.jsonl.gz",
+  "documents_seen": 3418,
+  "seed_rows": 53,
+  "produced_by_task": {
+    "seed": 53,
+    "keywords": 3418,
+    "summary": 2883,
+    "definition": 1029,
+    "heading": 604,
+    "code": 20
+  },
+  "rows": 7929,
+  "dropped_duplicates": 78,
+  "train": 7771,
+  "val": 158,
+  "val_fraction": 0.02,
+  "max_chars": 1600,
+  "seed": 1337
+}

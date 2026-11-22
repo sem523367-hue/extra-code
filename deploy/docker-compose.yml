@@ -1,0 +1,76 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file: ../.env
+    environment:
+      BACKEND: llama_cpp
+      MODEL_PATH: /models/extra-code-q4_k_m.gguf
+      API_DB_PATH: /data/keys.db
+      HOST: 0.0.0.0
+      PORT: "8000"
+    volumes:
+      - ../models:/models:ro
+      - api-data:/data
+    ports:
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+  bot:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file: ../.env
+    command: ["python", "-m", "bot.main"]
+    environment:
+      API_BASE_URL: http://api:8000
+      BOT_DB_PATH: /data/chats.db
+    volumes:
+      - bot-data:/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Optional accelerated engine from the "МЕТОДЫ УСКОРЕНИЯ" spec.
+  # It speaks the OpenAI API directly; point API_BASE_URL here and keep the
+  # FastAPI service for Telegram if you want its auth/limits layer.
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    profiles: ["accelerated"]
+    command:
+      - "-m"
+      - "/models/extra-code-q4_k_m.gguf"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "--ctx-size"
+      - "4096"
+      - "--parallel"
+      - "4"
+      - "--cont-batching"
+      - "-fa"
+      - "--prompt-cache"
+      - "/cache/prompt.cache"
+      - "--prompt-cache-ro"
+      - "--cache-ram"
+      - "4096"
+      - "--api-key"
+      - "${LLAMA_API_KEY:-local-key}"
+    volumes:
+      - ../models:/models:ro
+      - llama-cache:/cache
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+volumes:
+  api-data:
+  bot-data:
+  llama-cache:

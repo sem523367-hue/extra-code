@@ -1,0 +1,12 @@
+{"id": "ru-identity", "messages": [{"role": "user", "content": "Кто ты?"}], "max_tokens": 48, "temperature": 0}
+{"id": "ru-explain-token", "messages": [{"role": "user", "content": "Что такое токен в языковой модели? Ответь двумя предложениями."}], "max_tokens": 64, "temperature": 0}
+{"id": "ru-explain-kv", "messages": [{"role": "user", "content": "Зачем нужен KV-кэш при генерации текста?"}], "max_tokens": 80, "temperature": 0}
+{"id": "ru-code-loop", "messages": [{"role": "user", "content": "Напиши функцию на Python, которая считает сумму чисел от 1 до n."}], "max_tokens": 96, "temperature": 0}
+{"id": "ru-rewrite", "messages": [{"role": "user", "content": "Перепиши короче: Сервер обрабатывает запросы последовательно, поэтому при большой нагрузке очередь растёт и время ожидания увеличивается."}], "max_tokens": 64, "temperature": 0}
+{"id": "ru-json", "messages": [{"role": "user", "content": "Верни JSON с полями name и version для проекта Extra code версии 1.0.0. Без пояснений."}], "max_tokens": 64, "temperature": 0}
+{"id": "ru-math", "messages": [{"role": "user", "content": "Сколько будет 17 * 23? Покажи только ответ."}], "max_tokens": 24, "temperature": 0}
+{"id": "ru-summary", "messages": [{"role": "system", "content": "Ты сжимаешь текст в два предложения."}, {"role": "user", "content": "Квантование Q4_K_M хранит веса в 4 битах на параметр с отдельными масштабами для блоков. Это уменьшает размер модели примерно в четыре раза по сравнению с fp16, но добавляет небольшую ошибку округления. На практике потеря качества на моделях от 7B обычно незаметна, а на моделях меньше 100M параметров требует проверки через perplexity."}], "max_tokens": 96, "temperature": 0}
+{"id": "en-explain", "messages": [{"role": "user", "content": "Explain in one sentence why speculative decoding does not change the output distribution."}], "max_tokens": 64, "temperature": 0}
+{"id": "en-code", "messages": [{"role": "user", "content": "Write a Python function that reverses a string without slicing."}], "max_tokens": 96, "temperature": 0}
+{"id": "en-format", "messages": [{"role": "user", "content": "List three HTTP status codes for rate limiting and say what each means. Use a bullet list."}], "max_tokens": 96, "temperature": 0}
+{"id": "en-refuse-unknown", "messages": [{"role": "user", "content": "What is the exact release date of Extra code 2.0?"}], "max_tokens": 64, "temperature": 0}

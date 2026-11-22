@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "extra-code"
+version = "1.0.0"
+description = "Compact decoder-only LLM: corpus pipeline, training, GGUF export, OpenAI-compatible server, Telegram bot"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.7",
+    "httpx>=0.27",
+    "numpy>=1.26",
+    "tokenizers>=0.20",
+    "aiogram>=3.13",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+train = ["torch>=2.3", "datasets>=2.20", "pyarrow>=16"]
+export = ["gguf>=0.10", "sentencepiece>=0.2"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.setuptools]
+packages = ["server", "bot", "model", "train", "data", "data.collect", "export", "eval", "bench"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

@@ -1,0 +1,30 @@
+{"id": "py-comprehension", "messages": [{"role": "user", "content": "Чем list comprehension отличается от генератора в Python? Покажи пример."}]}
+{"id": "py-decorator", "messages": [{"role": "user", "content": "Напиши декоратор на Python, который логирует время работы функции."}]}
+{"id": "py-gil", "messages": [{"role": "user", "content": "Что такое GIL и когда нужен multiprocessing?"}]}
+{"id": "py-asyncio", "messages": [{"role": "user", "content": "Как параллельно выполнить несколько HTTP-запросов в asyncio?"}]}
+{"id": "py-dataclass", "messages": [{"role": "user", "content": "Что даёт @dataclass и когда он не подходит?"}]}
+{"id": "cpp-raii", "messages": [{"role": "user", "content": "Покажи RAII на unique_ptr в C++."}]}
+{"id": "cpp-move", "messages": [{"role": "user", "content": "Что делает std::move и когда он не нужен?"}]}
+{"id": "cpp-virtual-dtor", "messages": [{"role": "user", "content": "Почему базовому классу нужен виртуальный деструктор?"}]}
+{"id": "cpp-threads", "messages": [{"role": "user", "content": "Покажи потокобезопасную очередь на mutex и condition_variable в C++."}]}
+{"id": "cpp-cmake", "messages": [{"role": "user", "content": "Дай минимальный CMakeLists для C++20 проекта."}]}
+{"id": "java-streams", "messages": [{"role": "user", "content": "Покажи Stream API в Java: filter, map, collect."}]}
+{"id": "java-generics", "messages": [{"role": "user", "content": "Как работают generics в Java и что такое стирание типов?"}]}
+{"id": "java-gc", "messages": [{"role": "user", "content": "Как устроен сборщик мусора в JVM и какие флаги крутить?"}]}
+{"id": "c-malloc", "messages": [{"role": "user", "content": "Как правильно выделять и расширять память через malloc/realloc в C?"}]}
+{"id": "c-pointers", "messages": [{"role": "user", "content": "Объясни арифметику указателей в C на примере массива."}]}
+{"id": "c-ub", "messages": [{"role": "user", "content": "Перечисли частые UB в C."}]}
+{"id": "cs-linq", "messages": [{"role": "user", "content": "Покажи LINQ в C#: фильтрация, группировка, проекция."}]}
+{"id": "cs-async", "messages": [{"role": "user", "content": "Как правильно писать async/await в C#?"}]}
+{"id": "cs-dispose", "messages": [{"role": "user", "content": "Чем отличается using от финализатора и как реализовать IDisposable?"}]}
+{"id": "asm-abi", "messages": [{"role": "user", "content": "Как передаются аргументы функции в System V AMD64?"}]}
+{"id": "asm-syscall", "messages": [{"role": "user", "content": "Как сделать write и exit через syscall в Linux x86-64?"}]}
+{"id": "asm-prologue", "messages": [{"role": "user", "content": "Зачем нужен пролог функции и как выглядит эпилог?"}]}
+{"id": "re-pe", "messages": [{"role": "user", "content": "Из чего состоит PE-файл Windows?"}]}
+{"id": "re-iat", "messages": [{"role": "user", "content": "Что такое IAT и как по импортам понять поведение программы?"}]}
+{"id": "re-upx", "messages": [{"role": "user", "content": "Как распаковать UPX и что делать с кастомным пакером?"}]}
+{"id": "re-vtable", "messages": [{"role": "user", "content": "Как восстановить классы C++ по таблицам виртуальных функций?"}]}
+{"id": "algo-bsearch", "messages": [{"role": "user", "content": "Напиши бинарный поиск без ошибок на единицу."}]}
+{"id": "algo-knapsack", "messages": [{"role": "user", "content": "Реши задачу о рюкзаке 0/1 динамикой."}]}
+{"id": "tools-git", "messages": [{"role": "user", "content": "Дай рабочий набор git-команд для ветки и слияния."}]}
+{"id": "tools-docker", "messages": [{"role": "user", "content": "Собери минимальный Docker-образ для Python-приложения."}]}
