@@ -179,6 +179,10 @@ if (Test-Health $ApiPort) {
         "set N_CTX=$Ctx",
         'set API_KEY=local-dev-key',
         'set GENERATION_TIMEOUT_S=180',
+        'rem full answers, not clipped stubs: 256 tokens is ~4 sentences',
+        'set DEFAULT_MAX_TOKENS=1200',
+        'set MAX_TOKENS_CAP=3000',
+        'set DEFAULT_TEMPERATURE=0.8',
         "`"$py`" -m uvicorn server.main:app --host 127.0.0.1 --port $ApiPort >> server-out.log 2>> server-err.log"
     ) -join "`r`n"
     Set-Content -LiteralPath $runner -Value $runnerContent -Encoding ASCII

@@ -96,9 +96,9 @@ class Settings:
     openai_model: str = "local"
 
     # --- sampling ------------------------------------------------------
-    default_max_tokens: int = 256
-    max_tokens_cap: int = 512
-    default_temperature: float = 0.7
+    default_max_tokens: int = 768
+    max_tokens_cap: int = 2048
+    default_temperature: float = 0.8
     default_top_p: float = 0.9
     default_top_k: int = 40
     default_repeat_penalty: float = 1.1

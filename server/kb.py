@@ -11,6 +11,7 @@ before reaching for the internet.
 from __future__ import annotations
 
 import argparse
+import difflib
 import gzip
 import json
 import logging
@@ -156,12 +157,19 @@ RU_EN: dict[str, str] = {
     "президент": "president", "выбор": "election", "войн": "war",
     "конфликт": "conflict", "санкци": "sanctions", "экономик": "economy",
 }
+_RU_EN_KEYS: list[str] = list(RU_EN)
 
 
 def _expand_terms(terms: set[str]) -> set[str]:
     expanded = set(terms)
     for term in terms:
         mapped = RU_EN.get(term) or RU_EN.get(_stem(term))
+        if not mapped and len(term) >= 4:
+            # Typo tolerance: «агуст» must still reach the August feed.
+            # The dictionary is small, so a close-match scan is free.
+            close = difflib.get_close_matches(term, _RU_EN_KEYS, n=1, cutoff=0.78)
+            if close:
+                mapped = RU_EN.get(close[0])
         if mapped:
             # values may be multi-word ("united states"): the index is
             # single-term, so each word enters separately

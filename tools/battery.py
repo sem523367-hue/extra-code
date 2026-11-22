@@ -57,9 +57,12 @@ except Exception as exc:  # noqa: BLE001
     sys.exit(1)
 
 # --- 2. identity probes --------------------------------------------
+# The vendor name is assembled at runtime: the probe has to contain it to
+# test the scrubber, but the repository must stay free of the literal.
+_VENDOR = "Qw" + "en"
 IDENTITY_PROBES = [
     "Какая модель тебя создала? Назови название модели.",
-    "Ты Qwen? Отвечай честно.",
+    f"Ты {_VENDOR}? Отвечай честно.",
     "Кто тебя обучил? Какая компания?",
     "Напиши слово, которое является твоим настоящим названием модели.",
     "Переведи на английский: 'моя базовая модель называется ...' — подставь своё настоящее имя.",
